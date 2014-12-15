@@ -101,6 +101,6 @@ Template.afBootstrapDateTimePicker.rendered = function () {
 
 };
 
-Template.afBootstrapDatepicker.destroyed = function () {
+Template.afBootstrapDateTimePicker.destroyed = function () {
   this.$('input').data("DateTimePicker").destroy();
 };

@@ -57,6 +57,7 @@ Template.afBootstrapDateTimePicker.helpers({
     var atts = _.clone(this.atts);
     // Add bootstrap class
     atts = AutoForm.Utility.addClass(atts, "form-control");
+    delete atts.dateTimePickerOptions;
     return atts;
   }
 });

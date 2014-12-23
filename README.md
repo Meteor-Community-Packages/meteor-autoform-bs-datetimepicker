@@ -10,7 +10,7 @@ Bootstrap and the plugin library must be installed separately.
 In a Meteor app directory, enter:
 
 ```bash
-$ meteor add mizzao:bootstrap-3
+$ meteor add twbs:bootstrap
 $ meteor add tsega:bootstrap3-datetimepicker
 $ meteor add aldeed:autoform
 ```

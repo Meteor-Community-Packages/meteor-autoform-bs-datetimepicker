@@ -1,5 +1,20 @@
 AutoForm.addInputType("bootstrap-datetimepicker", {
   template: "afBootstrapDateTimePicker",
+  valueIn: function (val, atts) {
+    // datetimepicker expects the date to represent local time,
+    // so we need to adjust it if there's a timezoneId specified
+    var timezoneId = atts.timezoneId;
+    if (typeof timezoneId === "string") {
+      if (typeof moment.tz !== "function") {
+        throw new Error("If you specify a timezoneId, make sure that you've added a moment-timezone package to your app");
+      }
+      if (val instanceof Date) {
+        return moment(AutoForm.Utility.dateToNormalizedLocalDateAndTimeString(val, timezoneId), "YYYY-MM-DD[T]HH:mm:ss.SSS").toDate();
+      }
+    }
+
+    return val;
+  },
   valueOut: function () {
     var m = this.data("DateTimePicker").getDate();
     

@@ -85,9 +85,9 @@ Template.afBootstrapDateTimePicker.rendered = function () {
   // To be able to properly detect a cleared field, the defaultDate,
   // which is "" by default, must be null instead. Otherwise we get
   // the current datetime when we call getDate() on an empty field.
-  if (!opts.defaultDate || opts.defaultDate === "") {
-    opts.defaultDate = null;
-  }
+  // if (!opts.defaultDate || opts.defaultDate === "") {
+  //   opts.defaultDate = null;
+  // }
 
   // instanciate datetimepicker
   $input.datetimepicker(opts);

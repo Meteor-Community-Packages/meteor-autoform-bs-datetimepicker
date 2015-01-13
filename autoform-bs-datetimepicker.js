@@ -29,17 +29,18 @@ AutoForm.addInputType('bootstrap-datetimepicker', {
         return moment(AutoForm.Utility.dateToNormalizedLocalDateAndTimeString(val, timezoneId), "YYYY-MM-DD[T]HH:mm:ss.SSS").toDate();
       }
     }
-    var outMode = atts.outMode;
-    if (outMode === 'utcDate')
-      return utcDateToLocal(val);
-    else if (outMode === 'utcDateTime')
-      return utcDateTimeToLocal(val);
-    else
-      return val;
+    if (val instanceof Date) {
+      var outMode = atts.outMode;
+      if (outMode === 'utcDate')
+        return utcDateToLocal(val);
+      else if (outMode === 'utcDateTime')
+        return utcDateTimeToLocal(val);
+    }
+    return val;
   },
   valueOut: function () {
-    var $input = this.data('has-button') ? this.parent() : this;
-    var dtp = $input.data('DateTimePicker');
+    var $element = this.data('has-button') ? this.parent() : this;
+    var dtp = $element.data('DateTimePicker');
     var m = dtp.date();
     if (!m) {
       return m;
@@ -51,6 +52,7 @@ AutoForm.addInputType('bootstrap-datetimepicker', {
         throw new Error("If you specify a timezoneId, make sure that you've added a moment-timezone package to your app");
       }
       m = moment.tz(AutoForm.Utility.dateToNormalizedLocalDateAndTimeString(m.toDate()), timezoneId);
+      return m.toDate();
     }
     var outMode = this.data('out-mode');
     if (outMode === 'utcDate')
@@ -113,17 +115,17 @@ Template.afBootstrapDateTimePicker.helpers({
 });
 
 Template.afBootstrapDateTimePicker.rendered = function () {
-  var $input = this.data.atts.buttonClasses ? this.$('input').parent() : this.$('input');
+  var $element = this.data.atts.buttonClasses ? this.$('input').parent() : this.$('input');
   var data = this.data;
   var opts = data.atts.dateTimePickerOptions || {};
 
   // instanciate datetimepicker
-  $input.datetimepicker(opts);
+  $element.datetimepicker(opts);
 
   // set and reactively update values
   this.autorun(function () {
     var data = Template.currentData();
-    var dtp = $input.data('DateTimePicker');
+    var dtp = $element.data('DateTimePicker');
 
     // set field value
     if (data.value) {
@@ -150,33 +152,27 @@ Template.afBootstrapDateTimePicker.rendered = function () {
 };
 
 Template.afBootstrapDateTimePicker.destroyed = function () {
-  var $input = this.data.atts.buttonClasses ? this.$('input').parent() : this.$('input');
-  var dtp = $input.data('DateTimePicker');
+  var $element = this.data.atts.buttonClasses ? this.$('input').parent() : this.$('input');
+  var dtp = $element.data('DateTimePicker');
   if (dtp) {
     dtp.destroy();
   }
 };
 
 function utcDateTimeToLocal(utcDateTime) {
-  var local = new Date();
-  local.setDate(utcDateTime.getUTCDate());
-  local.setMonth(utcDateTime.getUTCMonth());
-  local.setFullYear(utcDateTime.getUTCFullYear());
-  local.setHours(utcDateTime.getUTCHours());
-  local.setMinutes(utcDateTime.getUTCMinutes());
-  local.setSeconds(0);
-  local.setMilliseconds(0);
-  return local;
+  return new Date(
+    utcDateTime.getUTCFullYear(),
+    utcDateTime.getUTCMonth(),
+    utcDateTime.getUTCDate(),
+    utcDateTime.getUTCHours(),
+    utcDateTime.getUTCMinutes(),
+    0, 0);
 }
 
 function utcDateToLocal(utcDate) {
-  var local = new Date();
-  local.setDate(utcDateTime.getUTCDate());
-  local.setMonth(utcDateTime.getUTCMonth());
-  local.setFullYear(utcDateTime.getUTCFullYear());
-  local.setHours(0);
-  local.setMinutes(0);
-  local.setSeconds(0);
-  local.setMilliseconds(0);
-  return local;
+  return new Date(
+    utcDateTime.getUTCFullYear(),
+    utcDateTime.getUTCMonth(),
+    utcDateTime.getUTCDate(),
+    0, 0, 0, 0);
 }

@@ -148,7 +148,6 @@ Template.afBootstrapDateTimePicker.rendered = function () {
       dtp.maxDate(false);
     }
   });
-
 };
 
 Template.afBootstrapDateTimePicker.destroyed = function () {
@@ -171,8 +170,8 @@ function utcDateTimeToLocal(utcDateTime) {
 
 function utcDateToLocal(utcDate) {
   return new Date(
-    utcDateTime.getUTCFullYear(),
-    utcDateTime.getUTCMonth(),
-    utcDateTime.getUTCDate(),
+    utcDate.getUTCFullYear(),
+    utcDate.getUTCMonth(),
+    utcDate.getUTCDate(),
     0, 0, 0, 0);
 }

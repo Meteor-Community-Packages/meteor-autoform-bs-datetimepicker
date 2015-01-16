@@ -119,35 +119,44 @@ Template.afBootstrapDateTimePicker.rendered = function () {
   var data = this.data;
   var opts = data.atts.dateTimePickerOptions || {};
 
+  // set start date if there's a min in the schema
+  if (this.data.min) {
+    opts.minDate = this.data.min;
+  }
+
+  // set end date if there's a max in the schema
+  if (this.data.max) {
+    opts.maxDate = this.data.max;
+  }
+
   // instanciate datetimepicker
-  $element.datetimepicker(opts);
+  var dtp = $element.datetimepicker(opts).data('DateTimePicker');
 
-  // set and reactively update values
-  this.autorun(function () {
-    var data = Template.currentData();
-    var dtp = $element.data('DateTimePicker');
+  // set field value
+  if (this.data.value) {
+    dtp.date(this.data.value);
+  } else {
+    dtp.date(null); // clear
+  }
 
-    // set field value
-    if (data.value) {
-      dtp.date(data.value);
-    } else {
-      dtp.date(null); // clear
-    }
-
-    // set start date if there's a min in the schema
-    if (data.min) {
-      dtp.minDate(data.min);
-    } else {
-      dtp.minDate(false);
-    }
-
-    // set end date if there's a max in the schema
-    if (data.max) {
-      dtp.maxDate(data.max);
-    } else {
-      dtp.maxDate(false);
-    }
-  });
+  // TODO: https://github.com/Eonasdan/bootstrap-datetimepicker/pull/748
+  // var isOpen = false;
+  // $element.on('keydown', function(e) {
+  //   if (e.keyCode === 40) {
+  //     if (!isOpen) {
+  //       dtp.show();
+  //     }
+  //     e.preventDefault();
+  //   }
+  // });
+  // $element.on('show.dp', function(e) {
+  //   cl('show');
+  //   isOpen = true;
+  // });
+  // $element.on('hide.dp', function(e) {
+  //   cl('hide');
+  //   isOpen = false;
+  // });
 };
 
 Template.afBootstrapDateTimePicker.destroyed = function () {

@@ -31,10 +31,11 @@ AutoForm.addInputType('bootstrap-datetimepicker', {
     }
     if (val instanceof Date) {
       var outMode = atts.outMode;
-      if (outMode === 'utcDate')
+      if (outMode === 'utcDate') {
         return utcDateToLocal(val);
-      else if (outMode === 'utcDateTime')
+      } else if (outMode === 'utcDateTime') {
         return utcDateTimeToLocal(val);
+      }
     }
     return val;
   },
@@ -55,12 +56,13 @@ AutoForm.addInputType('bootstrap-datetimepicker', {
       return m.toDate();
     }
     var outMode = this.data('out-mode');
-    if (outMode === 'utcDate')
+    if (outMode === 'utcDate') {
       return moment.utc([m.year(), m.month(), m.date(), 0, 0, 0, 0]).toDate();
-    else if (outMode === 'utcDateTime')
+    } else if (outMode === 'utcDateTime') {
       return moment.utc([m.year(), m.month(), m.date(), m.hour(), m.minute(), 0, 0]).toDate();
-    else
+    } else {
       return m.toDate();
+    }
   },
   valueConverters: {
     'string': function (val) {

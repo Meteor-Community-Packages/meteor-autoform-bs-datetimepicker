@@ -144,19 +144,20 @@ Template.afBootstrapDateTimePicker.rendered = function () {
   // TODO: https://github.com/Eonasdan/bootstrap-datetimepicker/pull/748
   // var isOpen = false;
   // $element.on('keydown', function(e) {
-  //   if (e.keyCode === 40) {
-  //     if (!isOpen) {
-  //       dtp.show();
-  //     }
+  //   if (e.keyCode === 27 && isOpen) { // allow escape to hide picker
+  //     dtp.hide();
+  //     e.preventDefault();
+  //     e.stopPropagation();
+  //   }
+  //   if (e.keyCode === 40 && !isOpen) { // allow down to show picker
+  //     dtp.show();
   //     e.preventDefault();
   //   }
   // });
   // $element.on('show.dp', function(e) {
-  //   cl('show');
   //   isOpen = true;
   // });
   // $element.on('hide.dp', function(e) {
-  //   cl('hide');
   //   isOpen = false;
   // });
 };

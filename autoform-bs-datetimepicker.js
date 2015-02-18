@@ -13,6 +13,7 @@ Usage
       outMode: null # 'utcDate', 'utcDateTime'
       timezoneId: null # http://momentjs.com/timezone/
       dateTimePickerOptions: {}
+      isReactiveValue: true
 ```
 */
 AutoForm.addInputType('bootstrap-datetimepicker', {
@@ -118,8 +119,7 @@ Template.afBootstrapDateTimePicker.helpers({
 
 Template.afBootstrapDateTimePicker.rendered = function () {
   var $element = this.data.atts.buttonClasses ? this.$('input').parent() : this.$('input');
-  var data = this.data;
-  var opts = data.atts.dateTimePickerOptions || {};
+  var opts = this.data.atts.dateTimePickerOptions || {};
 
   // set start date if there's a min in the schema
   if (this.data.min) {
@@ -134,11 +134,42 @@ Template.afBootstrapDateTimePicker.rendered = function () {
   // instanciate datetimepicker
   var dtp = $element.datetimepicker(opts).data('DateTimePicker');
 
-  // set field value
-  if (this.data.value) {
-    dtp.date(this.data.value);
+  var isReactiveValue;
+  if (_.has(this.data.atts, 'isReactiveValue')) {
+    isReactiveValue = this.data.atts.isReactiveValue;
   } else {
-    dtp.date(null); // clear
+    isReactiveValue = _defaults.isReactiveValue;
+  }
+
+  if (isReactiveValue) {
+    // set and reactively update values
+    this.autorun(function () {
+      var data = Template.currentData();
+
+      // set field value
+      if (data.value) {
+        dtp.date(data.value);
+      } else {
+        dtp.date(null); // clear
+      }
+
+      // set start date if there's a min in the schema
+      if (data.min) {
+        dtp.minDate(data.min);
+      }
+
+      // set end date if there's a max in the schema
+      if (data.max) {
+        dtp.maxDate(data.max);
+      }
+    });
+  } else {
+    // set field value
+    if (this.data.value) {
+      dtp.date(this.data.value);
+    } else {
+      dtp.date(null); // clear
+    }
   }
 
   // TODO: https://github.com/Eonasdan/bootstrap-datetimepicker/pull/748
@@ -186,4 +217,15 @@ function utcDateToLocal(utcDate) {
     utcDate.getUTCMonth(),
     utcDate.getUTCDate(),
     0, 0, 0, 0);
+}
+
+var _defaults = {
+  isReactiveValue: false
+};
+
+AutoForm.BootstrapDateTimePicker = {};
+AutoForm.BootstrapDateTimePicker.setDefaults = function (o) {
+  if (_.has(o, 'isReactiveValue')) {
+    _defaults.isReactiveValue = o.isReactiveValue;
+  }
 }

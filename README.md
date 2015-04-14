@@ -11,7 +11,7 @@ In a Meteor app directory, enter:
 
 ```bash
 $ meteor add twbs:bootstrap
-$ meteor add tsega:bootstrap3-datetimepicker
+$ meteor add tsega:bootstrap3-datetimepicker@=3.1.3_3
 $ meteor add aldeed:autoform
 ```
 

@@ -1,8 +1,8 @@
 Package.describe({
-  name: 'aldeed:autoform-bs-datetimepicker',
-  summary: 'Custom bootstrap-datetimepicker input type with timezone support for AutoForm',
-  version: '1.0.6',
-  git: 'https://github.com/aldeed/meteor-autoform-bs-datetimepicker.git'
+  name: 'stefanve:autoform-bs-datetimepicker',
+  summary: 'Custom bootstrap-datetimepicker input type with timezone support for AutoForm. Forked from aledeed:autoform-bs-datetimepicker and modified for compatibility with tsega:bootstrap3-datetimepicker version 4.0+',
+  version: '1.0.7',
+  git: 'https://github.com/stefanve/meteor-autoform-bs-datetimepicker.git'
 });
 
 Package.onUse(function(api) {

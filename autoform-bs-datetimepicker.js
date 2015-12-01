@@ -100,8 +100,6 @@ Template.afBootstrapDateTimePicker.rendered = function () {
     // set field value
     if (data.value instanceof Date) {
       dtp.setDate(data.value);
-    } else {
-      dtp.setDate(); // clear
     }
 
     // set start date if there's a min in the schema

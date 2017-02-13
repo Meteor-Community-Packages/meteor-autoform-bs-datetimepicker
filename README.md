@@ -58,6 +58,26 @@ Or on the `afFieldInput` component or any component that passes along attributes
 {{> afFieldInput name="typeTest" type="bootstrap-datetimepicker"}}
 ```
 
+## Using different date/time format
+
+```js
+{
+  'from': {
+    type: String,
+    label: 'From',
+    autoform: {
+      type: "bootstrap-datetimepicker",
+      dateTimePickerOptions: {
+        format: 'HH:mm',
+        stepping: 15,
+      },
+      template: "plain"
+    }
+  },
+}
+```
+
+
 ## Choosing a Timezone
 
 By default, the field's value will be a `Date` object representing the selected date and time in the browser's timezone (i.e., based on the user's computer time settings). In most cases, you probably want the `Date` object relative to some other timezone that you have previously stored. For example, if the form is setting the start date of an event, you want the date to be relative to the event venue's timezone. You can specify a different IANA timezone ID by adding a `timezoneId` attribute.

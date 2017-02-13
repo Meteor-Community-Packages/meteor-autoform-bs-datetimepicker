@@ -1,57 +1,90 @@
-AutoForm.addInputType("bootstrap-datetimepicker", {
-  template: "afBootstrapDateTimePicker",
+/*
+Prerequisites
+-------------
+$ meteor add comerc:bs-datetimepicker
+
+Usage
+-----
+```coffee
+  autoform:
+    afFieldInput:
+      type: "bootstrap-datetimepicker"
+      buttonClasses: null # 'glyphicon glyphicon-calendar', 'fa fa-calendar'
+      outMode: null # 'utcDate', 'utcDateTime'
+      timezoneId: null # http://momentjs.com/timezone/
+      dateTimePickerOptions: {}
+      isReactiveValue: true
+```
+*/
+AutoForm.addInputType('bootstrap-datetimepicker', {
+  template: 'afBootstrapDateTimePicker',
   valueIn: function (val, atts) {
     // datetimepicker expects the date to represent local time,
     // so we need to adjust it if there's a timezoneId specified
     var timezoneId = atts.timezoneId;
-    if (typeof timezoneId === "string") {
-      if (typeof moment.tz !== "function") {
+    if (typeof timezoneId === 'string') {
+      if (typeof moment.tz !== 'function') {
         throw new Error("If you specify a timezoneId, make sure that you've added a moment-timezone package to your app");
       }
       if (val instanceof Date) {
         return moment(AutoForm.Utility.dateToNormalizedLocalDateAndTimeString(val, timezoneId), "YYYY-MM-DD[T]HH:mm:ss.SSS").toDate();
       }
     }
-
+    if (val instanceof Date) {
+      var outMode = atts.outMode;
+      if (outMode === 'utcDate') {
+        return utcDateToLocal(val);
+      } else if (outMode === 'utcDateTime') {
+        return utcDateTimeToLocal(val);
+      }
+    }
     return val;
   },
   valueOut: function () {
-    var m = this.data("DateTimePicker").getDate();
-    
+    var $element = this.data('has-button') ? this.parent() : this;
+    var dtp = $element.data('DateTimePicker');
+    var m = dtp.date();
     if (!m) {
       return m;
     }
-    
-    var timezoneId = this.attr("data-timezone-id");
+    var timezoneId = this.data('timezone-id');
     // default is local, but if there's a timezoneId, we use that
-    if (typeof timezoneId === "string") {
-      if (typeof moment.tz !== "function") {
+    if (typeof timezoneId === 'string') {
+      if (typeof moment.tz !== 'function') {
         throw new Error("If you specify a timezoneId, make sure that you've added a moment-timezone package to your app");
       }
       m = moment.tz(AutoForm.Utility.dateToNormalizedLocalDateAndTimeString(m.toDate()), timezoneId);
+      return m.toDate();
     }
-    return m.toDate();
+    var outMode = this.data('out-mode');
+    if (outMode === 'utcDate') {
+      return moment.utc([m.year(), m.month(), m.date(), 0, 0, 0, 0]).toDate();
+    } else if (outMode === 'utcDateTime') {
+      return moment.utc([m.year(), m.month(), m.date(), m.hour(), m.minute(), 0, 0]).toDate();
+    } else {
+      return m.toDate();
+    }
   },
   valueConverters: {
-    "string": function (val) {
+    'string': function (val) {
       return (val instanceof Date) ? val.toString() : val;
     },
-    "stringArray": function (val) {
+    'stringArray': function (val) {
       if (val instanceof Date) {
         return [val.toString()];
       }
       return val;
     },
-    "number": function (val) {
+    'number': function (val) {
       return (val instanceof Date) ? val.getTime() : val;
     },
-    "numberArray": function (val) {
+    'numberArray': function (val) {
       if (val instanceof Date) {
         return [val.getTime()];
       }
       return val;
     },
-    "dateArray": function (val) {
+    'dateArray': function (val) {
       if (val instanceof Date) {
         return [val];
       }
@@ -59,10 +92,17 @@ AutoForm.addInputType("bootstrap-datetimepicker", {
     }
   },
   contextAdjust: function (context) {
+    if (context.atts.buttonClasses) {
+      context.atts['data-has-button'] = true;
+    }
     if (context.atts.timezoneId) {
-      context.atts["data-timezone-id"] = context.atts.timezoneId;
+      context.atts['data-timezone-id'] = context.atts.timezoneId;
     }
     delete context.atts.timezoneId;
+    if (context.atts.outMode) {
+      context.atts['data-out-mode'] = context.atts.outMode;
+    }
+    delete context.atts.outMode;
     return context;
   }
 });
@@ -71,55 +111,121 @@ Template.afBootstrapDateTimePicker.helpers({
   atts: function addFormControlAtts() {
     var atts = _.clone(this.atts);
     // Add bootstrap class
-    atts = AutoForm.Utility.addClass(atts, "form-control");
+    atts = AutoForm.Utility.addClass(atts, 'form-control');
     delete atts.dateTimePickerOptions;
     return atts;
   }
 });
 
 Template.afBootstrapDateTimePicker.rendered = function () {
-  var $input = this.$('input');
-  var data = this.data;
-  var opts = data.atts.dateTimePickerOptions || {};
-  
-  // To be able to properly detect a cleared field, the defaultDate,
-  // which is "" by default, must be null instead. Otherwise we get
-  // the current datetime when we call getDate() on an empty field.
-  if (!opts.defaultDate || opts.defaultDate === "") {
-    opts.defaultDate = null;
+  var $element = this.data.atts.buttonClasses ? this.$('input').parent() : this.$('input');
+  var opts = this.data.atts.dateTimePickerOptions || {};
+
+  // set start date if there's a min in the schema
+  if (this.data.min) {
+    opts.minDate = this.data.min;
+  }
+
+  // set end date if there's a max in the schema
+  if (this.data.max) {
+    opts.maxDate = this.data.max;
   }
 
   // instanciate datetimepicker
-  $input.datetimepicker(opts);
+  var dtp = $element.datetimepicker(opts).data('DateTimePicker');
 
-  // set and reactively update values
-  this.autorun(function () {
-    var data = Template.currentData();
-    var dtp = $input.data("DateTimePicker");
+  var isReactiveValue;
+  if (_.has(this.data.atts, 'isReactiveValue')) {
+    isReactiveValue = this.data.atts.isReactiveValue;
+  } else {
+    isReactiveValue = _defaults.isReactiveValue;
+  }
 
+  if (isReactiveValue) {
+    // set and reactively update values
+    this.autorun(function () {
+      var data = Template.currentData();
+
+      // set field value
+      if (data.value) {
+        dtp.date(data.value);
+      } else {
+        dtp.date(null); // clear
+      }
+
+      // set start date if there's a min in the schema
+      if (data.min) {
+        dtp.minDate(data.min);
+      }
+
+      // set end date if there's a max in the schema
+      if (data.max) {
+        dtp.maxDate(data.max);
+      }
+    });
+  } else {
     // set field value
-    if (data.value instanceof Date) {
-      dtp.setDate(data.value);
+    if (this.data.value) {
+      dtp.date(this.data.value);
     } else {
-      dtp.setDate(); // clear
+      dtp.date(null); // clear
     }
+  }
 
-    // set start date if there's a min in the schema
-    if (data.min instanceof Date) {
-      dtp.setMinDate(data.min);
-    }
-
-    // set end date if there's a max in the schema
-    if (data.max instanceof Date) {
-      dtp.setMaxDate(data.max);
-    }
-  });
-
+  // TODO: https://github.com/Eonasdan/bootstrap-datetimepicker/pull/748
+  // var isOpen = false;
+  // $element.on('keydown', function(e) {
+  //   if (e.keyCode === 27 && isOpen) { // allow escape to hide picker
+  //     dtp.hide();
+  //     e.preventDefault();
+  //     e.stopPropagation();
+  //   }
+  //   if (e.keyCode === 40 && !isOpen) { // allow down to show picker
+  //     dtp.show();
+  //     e.preventDefault();
+  //   }
+  // });
+  // $element.on('show.dp', function(e) {
+  //   isOpen = true;
+  // });
+  // $element.on('hide.dp', function(e) {
+  //   isOpen = false;
+  // });
 };
 
 Template.afBootstrapDateTimePicker.destroyed = function () {
-  var dtp = this.$('input').data("DateTimePicker");
+  var $element = this.data.atts.buttonClasses ? this.$('input').parent() : this.$('input');
+  var dtp = $element.data('DateTimePicker');
   if (dtp) {
     dtp.destroy();
   }
 };
+
+function utcDateTimeToLocal(utcDateTime) {
+  return new Date(
+    utcDateTime.getUTCFullYear(),
+    utcDateTime.getUTCMonth(),
+    utcDateTime.getUTCDate(),
+    utcDateTime.getUTCHours(),
+    utcDateTime.getUTCMinutes(),
+    0, 0);
+}
+
+function utcDateToLocal(utcDate) {
+  return new Date(
+    utcDate.getUTCFullYear(),
+    utcDate.getUTCMonth(),
+    utcDate.getUTCDate(),
+    0, 0, 0, 0);
+}
+
+var _defaults = {
+  isReactiveValue: false
+};
+
+AutoForm.BootstrapDateTimePicker = {};
+AutoForm.BootstrapDateTimePicker.setDefaults = function (o) {
+  if (_.has(o, 'isReactiveValue')) {
+    _defaults.isReactiveValue = o.isReactiveValue;
+  }
+}

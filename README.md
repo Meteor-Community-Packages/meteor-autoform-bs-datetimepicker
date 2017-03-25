@@ -1,6 +1,8 @@
 aldeed:autoform-bs-datetimepicker
 =========================
 
+IMPORTANT: This repo is no longer maintained. You can find forks and other alternatives that work better on [Atmosphere](https://atmospherejs.com/?q=autoform).
+
 An add-on Meteor package for [aldeed:autoform](https://github.com/aldeed/meteor-autoform). Provides a single custom input type, "bootstrap-datetimepicker", which renders an input using the [bootstrap-datetimepicker](http://eonasdan.github.io/bootstrap-datetimepicker/) plugin.
 
 ## Prerequisites
@@ -113,12 +115,6 @@ If you want to customize the appearance of the input, for example to use an inpu
 Template.dpReplacement.replaces("afBootstrapDateTimePicker");
 ```
 
-## Demo
-
-[Live](http://autoform.meteor.com/types)
-
 ## Contributing
 
 Anyone is welcome to contribute. Fork, make your changes, and then submit a pull request.
-
-[![Support via Gratipay](https://cdn.rawgit.com/gratipay/gratipay-badge/2.1.3/dist/gratipay.png)](https://gratipay.com/aldeed/)

@@ -41,7 +41,8 @@ In the schema, which will then work with a `quickForm` or `afQuickFields`:
     type: Date,
     autoform: {
       afFieldInput: {
-        type: "bootstrap-datetimepicker"
+        type: "bootstrap-datetimepicker",
+        dateTimePickerOptions: {}
       }
     }
   }

@@ -16,7 +16,7 @@ AutoForm.addInputType("bootstrap-datetimepicker", {
     return val;
   },
   valueOut: function () {
-    var m = this.data("DateTimePicker").getDate();
+    var m = this.data("DateTimePicker").date();
     
     if (!m) {
       return m;
@@ -96,12 +96,11 @@ Template.afBootstrapDateTimePicker.rendered = function () {
   this.autorun(function () {
     var data = Template.currentData();
     var dtp = $input.data("DateTimePicker");
-
     // set field value
     if (data.value instanceof Date) {
-      dtp.setDate(data.value);
+      dtp.date(data.value);
     } else {
-      dtp.setDate(); // clear
+      dtp.date(); // clear
     }
 
     // set start date if there's a min in the schema

@@ -1,7 +1,7 @@
 aldeed:autoform-bs-datetimepicker
 =========================
 
-IMPORTANT: This repo is no longer maintained. You can find forks and other alternatives that work better on [Atmosphere](https://atmospherejs.com/?q=autoform).
+IMPORTANT: This repo is no longer maintained (but may still work for you). You can find forks and other alternatives that work better on [Atmosphere](https://atmospherejs.com/?q=autoform).
 
 An add-on Meteor package for [aldeed:autoform](https://github.com/aldeed/meteor-autoform). Provides a single custom input type, "bootstrap-datetimepicker", which renders an input using the [bootstrap-datetimepicker](http://eonasdan.github.io/bootstrap-datetimepicker/) plugin.
 
@@ -20,8 +20,10 @@ $ meteor add aldeed:autoform
 If you need to use the `timezoneId` attribute to get the Date in some timezone other than the local client timezone, you must also add `moment-timezone`:
 
 ```bash
-$ meteor add mrt:moment-timezone
+$ meteor add risul:moment-timezone
 ```
+
+Or install and import the NPM package.
 
 ## Installation
 
